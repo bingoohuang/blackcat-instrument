@@ -21,19 +21,18 @@ public class TreeAsms {
         if (c == 'J') return LLOAD;
         if ("L[".indexOf(c) >= 0) return ALOAD;
 
-        throw new ClassFormatError("Invalid method signature: "
-                + type.getDescriptor());
+        throw new ClassFormatError("Invalid method signature: " + type.getDescriptor());
     }
 
-    private static int getStoreOpCode(Type type, char ch) {
+    private static int getStoreOpCode(Type type) {
+        char ch = type.getDescriptor().charAt(0);
         if ("BCIZS".indexOf(ch) >= 0) return ISTORE;
         if ('D' == ch) return DSTORE;
         if ('F' == ch) return FSTORE;
         if ('J' == ch) return LSTORE;
         if ("L[".indexOf(ch) >= 0) return ASTORE;
 
-        throw new ClassFormatError("Invalid method signature: "
-                + type.getDescriptor());
+        throw new ClassFormatError("Invalid method signature: " + type.getDescriptor());
     }
 
     public static InsnList getClassRefInst(Type type, int majorVersion) {
@@ -86,8 +85,7 @@ public class TreeAsms {
     }
 
     public static VarInsnNode getStoreInst(Type type, int position) {
-        char ch = type.getDescriptor().charAt(0);
-        int opCode = getStoreOpCode(type, ch);
+        int opCode = getStoreOpCode(type);
 
         return new VarInsnNode(opCode, position);
     }

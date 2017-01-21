@@ -7,12 +7,12 @@ import com.github.bingoohuang.blackcat.javaagent.utils.Asms;
 import com.github.bingoohuang.blackcat.javaagent.utils.Debugs;
 import com.github.bingoohuang.blackcat.javaagent.utils.Helper;
 import com.github.bingoohuang.blackcat.javaagent.utils.Tuple;
+import lombok.val;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
-import java.util.Iterator;
 import java.util.List;
 
 import static com.github.bingoohuang.blackcat.javaagent.utils.Asms.*;
@@ -23,40 +23,36 @@ public class BlackcatInstrument {
     protected final BlackcatJavaAgentInterceptor interceptor = BlackcatJavaAgentCallback.INSTANCE;
     protected final String className;
     protected final byte[] classFileBuffer;
-
     protected ClassNode classNode;
     protected Type classType;
-
     protected MethodNode methodNode;
     protected Type[] methodArgs;
     protected Type methodReturnType;
     protected int methodOffset;
-
     protected LabelNode startNode;
-
     protected int catVarIndex;
 
     public BlackcatInstrument(byte[] classFileBuffer) {
         this.classFileBuffer = classFileBuffer;
 
         classNode = new ClassNode();
-        ClassReader cr = new ClassReader(classFileBuffer);
+        val cr = new ClassReader(classFileBuffer);
         cr.accept(classNode, 0);
         className = c(classNode.name);
         classType = Type.getType("L" + classNode.name + ";");
     }
 
     public Tuple<Boolean, byte[]> modifyClass() {
-        boolean ok = interceptor.interceptClass(classNode, className);
+        val ok = interceptor.interceptClass(classNode, className);
         if (!ok) return new Tuple(false, classFileBuffer);
 
         int count = modifyMethodCount(classNode.methods);
         if (count == 0) return new Tuple(false, classFileBuffer);
 
-        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+        val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         classNode.accept(cw);
 
-        byte[] bytes = cw.toByteArray();
+        val bytes = cw.toByteArray();
 
         Debugs.writeClassFile(classNode, className, bytes);
 
@@ -90,7 +86,7 @@ public class BlackcatInstrument {
     }
 
     private void addTraceStart() {
-        InsnList insnList = new InsnList();
+        val insnList = new InsnList();
 
         addGetCallback(insnList);
 
@@ -130,11 +126,11 @@ public class BlackcatInstrument {
     }
 
     private void addTraceReturn() {
-        InsnList insnList = methodNode.instructions;
+        val insnList = methodNode.instructions;
 
-        Iterator<AbstractInsnNode> it = insnList.iterator();
+        val it = insnList.iterator();
         while (it.hasNext()) {
-            AbstractInsnNode insnNode = it.next();
+            val insnNode = (AbstractInsnNode) it.next();
 
             switch (insnNode.getOpcode()) {
                 case RETURN:
@@ -151,22 +147,20 @@ public class BlackcatInstrument {
     }
 
     private void addTraceThrow() {
-        InsnList insnList = methodNode.instructions;
-
-        Iterator<AbstractInsnNode> it = insnList.iterator();
+        val it = methodNode.instructions.iterator();
         while (it.hasNext()) {
-            AbstractInsnNode insnNode = it.next();
+            val insnNode = (AbstractInsnNode) it.next();
 
             switch (insnNode.getOpcode()) {
                 case ATHROW:
-                    insnList.insertBefore(insnNode, getThrowTraceInsts());
+                    methodNode.instructions.insertBefore(insnNode, getThrowTraceInsts());
                     break;
             }
         }
     }
 
     private void addTraceThrowableUncaught() {
-        InsnList insnList = methodNode.instructions;
+        val insnList = methodNode.instructions;
 
         LabelNode endNode = new LabelNode();
         insnList.add(endNode);
@@ -176,9 +170,9 @@ public class BlackcatInstrument {
     }
 
     private void addCatchBlock(LabelNode startNode, LabelNode endNode) {
-        InsnList insnList = new InsnList();
+        val insnList = new InsnList();
 
-        LabelNode handlerNode = new LabelNode();
+        val handlerNode = new LabelNode();
         insnList.add(handlerNode);
 
         int exceptionVariablePosition = getFistAvailablePosition();
@@ -200,7 +194,7 @@ public class BlackcatInstrument {
     }
 
     private InsnList getVoidReturnTraceInsts() {
-        InsnList insnList = new InsnList();
+        val insnList = new InsnList();
         insnList.add(new VarInsnNode(ALOAD, catVarIndex));
         insnList.add(new MethodInsnNode(INVOKEVIRTUAL,
                 p(Blackcat.class), "finish",
@@ -210,7 +204,7 @@ public class BlackcatInstrument {
     }
 
     private InsnList getThrowTraceInsts() {
-        InsnList insnList = new InsnList();
+        val insnList = new InsnList();
 
         int exceptionVariablePosition = getFistAvailablePosition();
         insnList.add(new VarInsnNode(ASTORE, exceptionVariablePosition));
@@ -229,7 +223,7 @@ public class BlackcatInstrument {
     }
 
     private InsnList getReturnTraceInsts() {
-        InsnList insnList = new InsnList();
+        val insnList = new InsnList();
 
         int returnedVariablePosition = getFistAvailablePosition();
         insnList.add(getStoreInst(methodReturnType, returnedVariablePosition));
