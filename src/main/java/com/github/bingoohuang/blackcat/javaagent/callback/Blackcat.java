@@ -37,17 +37,19 @@ public class Blackcat {
         String linkId = req.getHeader(BLACKCAT_LINK_ID);
         if (isEmpty(linkId)) linkId = "0";
 
-        Blackcat.reset(traceId, linkId, "URL", req.getMethod() + ":" + getURL(req));
+        Blackcat.reset(traceId, linkId, "URL",
+                req.getMethod() + ":" + getURL(req));
     }
 
     public static void prepareRPC(HttpRequest httpRequest) {
         val context = threadLocal.get();
         if (context == null) return;
 
-        log("RPC", httpRequest.getHttpMethod().name() + ":" + httpRequest.getUrl());
+        val httpMethod = httpRequest.getHttpMethod().name();
+        log("RPC", httpMethod + ":" + httpRequest.getUrl());
 
         httpRequest.header(BLACKCAT_TRACE_ID, context.getTraceId());
-        String linkId = context.getParentLinkId() + "." + context.getSubLinkId();
+        val linkId = context.getParentLinkId() + "." + context.getSubLinkId();
         httpRequest.header(BLACKCAT_LINK_ID, linkId);
     }
 
@@ -81,10 +83,10 @@ public class Blackcat {
         val blackcatContext = threadLocal.get();
         if (blackcatContext == null) return;
 
-        String parentLinkId = blackcatContext.getParentLinkId();
+        val parentLinkId = blackcatContext.getParentLinkId();
 
-        String traceId = blackcatContext.getTraceId();
-        String linkId = parentLinkId + "." + subLinkId;
+        val traceId = blackcatContext.getTraceId();
+        val linkId = parentLinkId + "." + subLinkId;
 
         val traceMsg = new BlackcatTraceMsg(traceId, linkId, msgType, msg);
         BlackcatClient.send(traceMsg);
@@ -92,19 +94,17 @@ public class Blackcat {
 
     private BlackcatMethodRt rt;
 
-    public void start(
-            Class<?> clazz,
-            String methodName,
-            String methodDesc,
-            Object... params) {
+    public void start(Class<?> clazz,
+                      String methodName,
+                      String methodDesc,
+                      Object... params) {
         start(clazz.getName(), methodName, methodDesc, params);
     }
 
-    public void start(
-            String className,
-            String methodName,
-            String methodDesc,
-            Object... params) {
+    public void start(String className,
+                      String methodName,
+                      String methodDesc,
+                      Object... params) {
         val instance = BlackcatJavaAgentCallback.getInstance();
         rt = instance.doStart(className, methodName, methodDesc, params);
         log("MethodStart", "invokeId:" + rt.invokeId
@@ -134,7 +134,7 @@ public class Blackcat {
     public static String getURL(HttpServletRequest req) {
         val scheme = req.getScheme();             // http
         val serverName = req.getServerName();     // hostname.com
-        val serverPort = req.getServerPort();        // 80
+        val serverPort = req.getServerPort();     // 80
         val contextPath = req.getContextPath();   // /mywebapp
         val servletPath = req.getServletPath();   // /servlet/MyServlet
         val pathInfo = req.getPathInfo();         // /a/b;c=123

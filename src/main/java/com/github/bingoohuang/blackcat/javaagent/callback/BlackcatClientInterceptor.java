@@ -34,13 +34,11 @@ public class BlackcatClientInterceptor extends BlackcatJavaAgentInterceptorAdapt
 
     @Override
     protected void onThrowableUncaught(BlackcatMethodRt rt) {
-        log.debug("onThrowableUncaught:{}", rt);
         BlackcatClient.send(rt);
     }
 
     @Override
     protected void onFinish(BlackcatMethodRt rt) {
-        log.debug("onThrowableUncaught:{}" + rt);
         BlackcatClient.send(rt);
     }
 
@@ -63,7 +61,7 @@ public class BlackcatClientInterceptor extends BlackcatJavaAgentInterceptorAdapt
 
     private boolean isMethodConfigured(MethodNode methodNode) {
         if (!Blackcats.hasDiamond) return false;
-        
+
         String config = readDiamond("blackcat^interceptMethods");
         if (StringUtils.isEmpty(config)) return false;
 

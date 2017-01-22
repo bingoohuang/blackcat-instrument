@@ -5,18 +5,19 @@ import com.github.bingoohuang.blackcat.sdk.protobuf.BlackcatMsg.BlackcatReq;
 import com.lmax.disruptor.EventHandler;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 @AllArgsConstructor @Slf4j
-public class BlackcatMethodRuntimeEventHandler implements EventHandler<BlackcatReq.Builder> {
+public class BlackcatReqEventHandler
+        implements EventHandler<BlackcatReq.Builder> {
     private final BlackcatNettyClient blackcatNettyClient;
 
     @Override
-    public void onEvent(
-            BlackcatReq.Builder builder,
-            long sequence,
-            boolean endOfBatch) throws Exception {
-        BlackcatReq blackcatReq = builder.build();
-        log.debug("send black req:{}", blackcatReq);
-        blackcatNettyClient.send(blackcatReq);
+    public void onEvent(BlackcatReq.Builder builder,
+                        long sequence,
+                        boolean endOfBatch) throws Exception {
+        val req = builder.build();
+        log.debug("send black req:{}", req);
+        blackcatNettyClient.send(req);
     }
 }

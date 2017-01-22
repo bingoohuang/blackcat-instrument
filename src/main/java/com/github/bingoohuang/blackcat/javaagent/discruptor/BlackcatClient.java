@@ -8,7 +8,6 @@ import com.github.bingoohuang.blackcat.sdk.protobuf.BlackcatMsg.BlackcatReq;
 import com.lmax.disruptor.dsl.Disruptor;
 import lombok.val;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class BlackcatClient {
@@ -18,14 +17,11 @@ public class BlackcatClient {
 
     static {
         // Executor that will be used to construct new threads for consumers
-        Executor executor = Executors.newCachedThreadPool();
-
+        val executor = Executors.newSingleThreadExecutor();
         // The factory for the event
-        val factory = new BlackcatMethodRuntimeFactory();
-
+        val factory = new BlackcatReqFactory();
         // Specify the size of the ring buffer, must be power of 2.
         int bufferSize = 1024;
-
         // Construct the Disruptor
         val disruptor = new Disruptor<BlackcatReq.Builder>(factory, bufferSize, executor);
 
@@ -33,7 +29,7 @@ public class BlackcatClient {
         nettyClient.connect();
 
         // Connect the handler
-        val handler = new BlackcatMethodRuntimeEventHandler(nettyClient);
+        val handler = new BlackcatReqEventHandler(nettyClient);
         disruptor.handleEventsWith(handler);
 
         // Start the Disruptor, starts all threads running
