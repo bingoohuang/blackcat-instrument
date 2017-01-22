@@ -221,7 +221,7 @@
                     <appendAssemblyId>true</appendAssemblyId>
                     <archive>
                         <manifestEntries>
-                            <Premain-Class>com.github.bingoohuang.blackcat.javaagent.instrument.BlackcatJavaAgent
+                            <Premain-Class>com.github.bingoohuang.blackcat.instrument.instrument.BlackcatJavaAgent
                             </Premain-Class>
                         </manifestEntries>
                     </archive>
