@@ -17,9 +17,11 @@ public class Blackcat {
 
     static ThreadLocal<BlackcatContext> threadLocal = new InheritableThreadLocal<BlackcatContext>();
 
-    public static void reset(
-            String blackcatTraceId, String parentLinkId,
-            String msgType, String msg) {
+    public static BlackcatContext reset(
+            String blackcatTraceId,
+            String parentLinkId,
+            String msgType,
+            String msg) {
         val blackcatContext = new BlackcatContext();
         blackcatContext.setTraceId(blackcatTraceId);
         blackcatContext.setParentLinkId(parentLinkId);
@@ -28,17 +30,27 @@ public class Blackcat {
         threadLocal.set(blackcatContext);
 
         log(blackcatContext.getSubLinkId(), msgType, msg);
+        return blackcatContext;
     }
 
-    public static void reset(HttpServletRequest req) {
+    public static BlackcatContext reset() {
+        val context = threadLocal.get();
+        if (context != null) return context;
+
+        val traceId = UUID.randomUUID().toString();
+        val linkId = "0";
+        return reset(traceId, linkId, "AUTO", "AUTO");
+    }
+
+    public static BlackcatContext reset(HttpServletRequest req) {
         String traceId = req.getHeader(BLACKCAT_TRACE_ID);
         if (isEmpty(traceId)) traceId = UUID.randomUUID().toString();
 
         String linkId = req.getHeader(BLACKCAT_LINK_ID);
         if (isEmpty(linkId)) linkId = "0";
 
-        Blackcat.reset(traceId, linkId, "URL",
-                req.getMethod() + ":" + getURL(req));
+        val msg = req.getMethod() + ":" + getURL(req);
+        return reset(traceId, linkId, "URL", msg);
     }
 
     public static void prepareRPC(HttpRequest httpRequest) {
@@ -58,30 +70,28 @@ public class Blackcat {
     }
 
     public static void count(String metricName, long countValue) {
-        log("COUNT", metricName + ":" + countValue);
+        logMsg("COUNT", metricName + ":" + countValue);
         BlackcatClient.send(new BlackcatMetricMsg(metricName, countValue));
     }
 
     public static void sum(String metricName, long sumValue) {
-        log("SUM", metricName + ":" + sumValue);
+        logMsg("SUM", metricName + ":" + sumValue);
         BlackcatClient.send(new BlackcatMetricMsg(metricName, sumValue));
     }
 
     public static void log(String pattern, Object... args) {
-        log("LOG", pattern, args);
+        logMsg("LOG", pattern, args);
     }
 
-    public static void log(String msgType, String pattern, Object... args) {
-        val blackcatContext = threadLocal.get();
-        if (blackcatContext == null) return;
+    public static void logMsg(String msgType, String pattern, Object... args) {
+        val blackcatContext = reset();
 
-        String msg = MessageFormatter.arrayFormat(pattern, args).getMessage();
+        val msg = MessageFormatter.arrayFormat(pattern, args).getMessage();
         log(blackcatContext.incrAndGetSubLinkId(), msgType, msg);
     }
 
     public static void log(int subLinkId, String msgType, String msg) {
-        val blackcatContext = threadLocal.get();
-        if (blackcatContext == null) return;
+        val blackcatContext = reset();
 
         val parentLinkId = blackcatContext.getParentLinkId();
 
