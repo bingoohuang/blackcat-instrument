@@ -16,36 +16,36 @@ import static com.alibaba.fastjson.JSON.toJSONString;
 public class BlackcatMethodRuntimeProducer {
     private final RingBuffer<BlackcatReq.Builder> ringBuffer;
 
-    public void send(BlackcatMethodRt methodRt) {
+    public void send(BlackcatMethodRt rt) {
         long sequence = ringBuffer.next();  // Grab the next sequence
         try {
             val builder = ringBuffer.get(sequence); // Get the entry in the Disruptor
             // for the sequence Fill with data
             val head = Blackcats.buildHead(ReqType.BlackcatMethodRuntime);
-            val runtimeBuilder = BlackcatMethodRuntime.newBuilder()
-                    .setInvokeId(methodRt.invokeId)
-                    .setTraceId(methodRt.traceId)
-                    .setLinkId(methodRt.linkId)
-                    .setPid(methodRt.pid)
-                    .setExecutionId(methodRt.executionId)
-                    .setStartMillis(methodRt.startMillis)
-                    .setEndMillis(methodRt.endMillis)
-                    .setCostNano(methodRt.costNano)
+            val rtBuilder = BlackcatMethodRuntime.newBuilder()
+                    .setInvokeId(rt.invokeId)
+                    .setTraceId(rt.traceId)
+                    .setLinkId(rt.linkId)
+                    .setPid(rt.pid)
+                    .setExecutionId(rt.executionId)
+                    .setStartMillis(rt.startMillis)
+                    .setEndMillis(rt.endMillis)
+                    .setCostNano(rt.costNano)
 
-                    .setClassName(methodRt.className)
-                    .setMethodName(methodRt.methodName)
-                    .setMethodDesc(methodRt.methodDesc)
-                    .setArgs(toJSONString(methodRt.args))
-                    .setResult(toJSONString(methodRt.result))
-                    .setThrowableCaught(toJSONString(methodRt.throwableCaught))
-                    .setSameThrowable(methodRt.sameThrowable)
-                    .setThrowableMessage(methodRt.throwableMessage);
-            if (!methodRt.sameThrowable) {
-                runtimeBuilder.setThrowableUncaught(
-                        toJSONString(methodRt.throwableUncaught));
+                    .setClassName(rt.className)
+                    .setMethodName(rt.methodName)
+                    .setMethodDesc(rt.methodDesc)
+                    .setArgs(toJSONString(rt.args))
+                    .setResult(toJSONString(rt.result))
+                    .setThrowableCaught(toJSONString(rt.throwableCaught))
+                    .setSameThrowable(rt.sameThrowable);
+            if (rt.throwableMessage != null)
+                rtBuilder.setThrowableMessage(rt.throwableMessage);
+            if (!rt.sameThrowable) {
+                rtBuilder.setThrowableUncaught(toJSONString(rt.throwableUncaught));
             }
 
-            val methodRuntime = runtimeBuilder.build();
+            val methodRuntime = rtBuilder.build();
             builder.setBlackcatReqHead(head)
                     .setBlackcatMethodRuntime(methodRuntime);
         } finally {
