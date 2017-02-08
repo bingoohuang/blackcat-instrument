@@ -107,7 +107,7 @@ public class BlackcatInstrument {
 
         insnList.add(new MethodInsnNode(INVOKEVIRTUAL,
                 p(Blackcat.class), "start",
-                sig(void.class, String.class, String.class, String.class, Object[].class),
+                sig(String.class, String.class, String.class, String.class, Object[].class),
                 false));
 
         startNode = new LabelNode();

@@ -24,6 +24,8 @@ public class BlackcatMethodRuntimeProducer {
             val head = Blackcats.buildHead(ReqType.BlackcatMethodRuntime);
             val runtimeBuilder = BlackcatMethodRuntime.newBuilder()
                     .setInvokeId(methodRt.invokeId)
+                    .setTraceId(methodRt.traceId)
+                    .setLinkId(methodRt.linkId)
                     .setPid(methodRt.pid)
                     .setExecutionId(methodRt.executionId)
                     .setStartMillis(methodRt.startMillis)
@@ -36,7 +38,8 @@ public class BlackcatMethodRuntimeProducer {
                     .setArgs(toJSONString(methodRt.args))
                     .setResult(toJSONString(methodRt.result))
                     .setThrowableCaught(toJSONString(methodRt.throwableCaught))
-                    .setSameThrowable(methodRt.sameThrowable);
+                    .setSameThrowable(methodRt.sameThrowable)
+                    .setThrowableMessage(methodRt.throwableMessage);
             if (!methodRt.sameThrowable) {
                 runtimeBuilder.setThrowableUncaught(
                         toJSONString(methodRt.throwableUncaught));

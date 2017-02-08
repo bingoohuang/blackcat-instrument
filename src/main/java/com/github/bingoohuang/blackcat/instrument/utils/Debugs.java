@@ -20,6 +20,8 @@ public class Debugs {
     }
 
     private static boolean isDebug(AnnotationNode annNode) {
+        if (annNode.values == null) return false;
+
         for (int i = 0, ii = annNode.values.size(); i < ii; i += 2) {
             String name = (String) annNode.values.get(i);
             Object value = annNode.values.get(i + 1);

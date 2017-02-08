@@ -24,6 +24,9 @@ public class BlackcatMethodRt {
     @Setter public Object result;
     public Throwable throwableUncaught;
     public boolean sameThrowable = false;
+    @Setter public String traceId;
+    @Setter public String linkId;
+    @Setter public String throwableMessage;
 
     public static String getPid() {
         String name = ManagementFactory.getRuntimeMXBean().getName();
@@ -45,11 +48,13 @@ public class BlackcatMethodRt {
 
     public void setThrowableCaught(Throwable throwableCaught) {
         this.throwableCaught = throwableCaught;
+        this.throwableMessage = throwableCaught.getMessage();
         this.sameThrowable = throwableCaught == throwableUncaught;
     }
 
     public void setThrowableUncaught(Throwable throwableUncaught) {
         this.throwableUncaught = throwableUncaught;
+        this.throwableMessage = throwableUncaught.getMessage();
         this.sameThrowable = throwableCaught == throwableUncaught;
     }
 

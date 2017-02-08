@@ -28,8 +28,13 @@ public class BlackcatClientInterceptor extends BlackcatJavaAgentInterceptorAdapt
 
     @Override
     public boolean interceptMethod(ClassNode classNode, MethodNode methodNode) {
-        return isAnnPresent(methodNode, BlackcatMonitor.class)
+        return !isCtor(methodNode) && isAnnPresent(classNode, BlackcatMonitor.class)
+                || isAnnPresent(methodNode, BlackcatMonitor.class)
                 || isMethodConfigured(methodNode);
+    }
+
+    private boolean isCtor(MethodNode methodNode) {
+        return "<init>".equals(methodNode.name);
     }
 
     @Override

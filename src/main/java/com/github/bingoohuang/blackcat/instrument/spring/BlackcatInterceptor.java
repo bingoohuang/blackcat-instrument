@@ -7,6 +7,8 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static com.alibaba.fastjson.JSON.toJSONString;
+
 public class BlackcatInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request,
@@ -21,7 +23,7 @@ public class BlackcatInterceptor extends HandlerInterceptorAdapter {
                            HttpServletResponse response,
                            Object handler,
                            ModelAndView modelAndView) throws Exception {
-        Blackcat.log("PostHandle", "post handle");
+        Blackcat.trace("PostHandle", "post handle");
         super.postHandle(request, response, handler, modelAndView);
     }
 
@@ -29,7 +31,9 @@ public class BlackcatInterceptor extends HandlerInterceptorAdapter {
     public void afterCompletion(HttpServletRequest request,
                                 HttpServletResponse response,
                                 Object handler, Exception ex) throws Exception {
-        Blackcat.log("Completion", "after completion", ex);
+        if (ex != null) Blackcat.trace("Exception", toJSONString(ex));
+        Blackcat.trace("Completion", "after completion");
+
         super.afterCompletion(request, response, handler, ex);
     }
 }
