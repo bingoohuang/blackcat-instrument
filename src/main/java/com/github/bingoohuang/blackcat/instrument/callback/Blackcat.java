@@ -133,8 +133,8 @@ public class Blackcat {
         rt = instance.doStart(className, methodName, methodDesc, params);
         rt.setTraceId(currentTraceId());
         val linkId = trace("MethodStart",
-                "Class:{},Method:{}, invokeId:{}",
-                className, methodName, rt.invokeId);
+                "{}, invokeId:{}",
+                className + "." + methodName, rt.invokeId);
         rt.setLinkId(linkId);
         return linkId;
     }
