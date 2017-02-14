@@ -95,7 +95,7 @@ public class Blackcat {
 
         val parentLinkId = blackcatContext.getParentLinkId();
         val traceId = blackcatContext.getTraceId();
-        val linkId = parentLinkId + "." + subLinkId;
+        val linkId = parentLinkId + String.format(".%02d", subLinkId);
 
         val traceMsg = new BlackcatTraceMsg(traceId, linkId, msgType, msg);
         BlackcatClient.send(traceMsg);

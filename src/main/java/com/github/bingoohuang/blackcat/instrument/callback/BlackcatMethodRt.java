@@ -2,13 +2,13 @@ package com.github.bingoohuang.blackcat.instrument.callback;
 
 import lombok.Setter;
 import lombok.ToString;
+import org.n3r.idworker.Id;
 
 import java.lang.management.ManagementFactory;
-import java.util.UUID;
 
 @ToString
 public class BlackcatMethodRt {
-    public final String invokeId = UUID.randomUUID().toString();
+    public final String invokeId = "" + Id.next();
     public final String executionId;
     public final String pid = getPid();
     public final long startMillis = System.currentTimeMillis();

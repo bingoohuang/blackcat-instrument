@@ -1,6 +1,8 @@
 package com.github.bingoohuang.blackcat.instrument.spring;
 
 import com.github.bingoohuang.blackcat.instrument.callback.Blackcat;
+import com.github.bingoohuang.blackcat.instrument.callback.BlackcatContext;
+import lombok.val;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -14,7 +16,9 @@ public class BlackcatInterceptor extends HandlerInterceptorAdapter {
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response,
                              Object handler) throws Exception {
-        Blackcat.reset(request);
+        val context = Blackcat.reset(request);
+        response.addHeader(Blackcat.BLACKCAT_TRACE_ID, context.getTraceId());
+
         return super.preHandle(request, response, handler);
     }
 
