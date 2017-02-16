@@ -9,6 +9,7 @@ import com.lmax.disruptor.RingBuffer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 
 import static com.alibaba.fastjson.JSON.toJSONString;
 
@@ -17,6 +18,8 @@ public class BlackcatMethodRuntimeProducer {
     private final RingBuffer<BlackcatReq.Builder> ringBuffer;
 
     public void send(BlackcatMethodRt rt) {
+        if (StringUtils.isBlank(rt.traceId)) return;
+
         long sequence = ringBuffer.next();  // Grab the next sequence
         try {
             val builder = ringBuffer.get(sequence); // Get the entry in the Disruptor

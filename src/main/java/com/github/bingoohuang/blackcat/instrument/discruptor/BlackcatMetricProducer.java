@@ -14,7 +14,7 @@ public class BlackcatMetricProducer {
     private final RingBuffer<BlackcatReq.Builder> ringBuffer;
 
     public void send(BlackcatMetricMsg metric) {
-        long sequence = ringBuffer.next();  // Grab the next sequence
+        val sequence = ringBuffer.next();  // Grab the next sequence
         try {
             val builder = ringBuffer.get(sequence); // Get the entry in the Disruptor
             // for the sequence Fill with data

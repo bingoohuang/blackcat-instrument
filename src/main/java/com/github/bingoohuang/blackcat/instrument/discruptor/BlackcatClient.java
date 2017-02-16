@@ -21,7 +21,7 @@ public class BlackcatClient {
         // The factory for the event
         val factory = new BlackcatReqFactory();
         // Specify the size of the ring buffer, must be power of 2.
-        int bufferSize = 1024;
+        val bufferSize = 1024;
         // Construct the Disruptor
         val disruptor = new Disruptor<BlackcatReq.Builder>(factory, bufferSize, executor);
 

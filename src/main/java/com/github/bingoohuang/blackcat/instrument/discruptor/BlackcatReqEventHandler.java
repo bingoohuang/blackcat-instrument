@@ -8,8 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 @AllArgsConstructor @Slf4j
-public class BlackcatReqEventHandler
-        implements EventHandler<BlackcatReq.Builder> {
+public class BlackcatReqEventHandler implements EventHandler<BlackcatReq.Builder> {
     private final BlackcatNettyClient blackcatNettyClient;
 
     @Override

@@ -3,7 +3,7 @@
 
     <groupId>com.github.bingoohuang</groupId>
     <artifactId>blackcat-instrument</artifactId>
-    <version>0.0.9-SNAPSHOT </version>
+    <version>0.0.10-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>blackcat-instrument</name>
@@ -40,7 +40,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.16.10</version>
+            <version>1.16.14</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
@@ -86,12 +86,12 @@
         <dependency>
             <groupId>com.lmax</groupId>
             <artifactId>disruptor</artifactId>
-            <version>3.3.2</version>
+            <version>3.3.6</version>
         </dependency>
         <dependency>
             <groupId>com.github.bingoohuang</groupId>
             <artifactId>blackcat-sdk</artifactId>
-            <version>0.0.5</version>
+            <version>0.0.6</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>

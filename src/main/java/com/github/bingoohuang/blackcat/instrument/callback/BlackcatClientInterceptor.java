@@ -52,7 +52,7 @@ public class BlackcatClientInterceptor extends BlackcatJavaAgentInterceptorAdapt
             List<MethodNode> methodNodes) {
         if (!Blackcats.hasDiamond) return false;
 
-        String config = readDiamond("blackcat^interceptClasses");
+        val config = readDiamond("blackcat^interceptClasses");
         if (StringUtils.isEmpty(config)) return false;
 
         val dottedClassName = className.replace('/', '.');
@@ -67,7 +67,7 @@ public class BlackcatClientInterceptor extends BlackcatJavaAgentInterceptorAdapt
     private boolean isMethodConfigured(MethodNode methodNode) {
         if (!Blackcats.hasDiamond) return false;
 
-        String config = readDiamond("blackcat^interceptMethods");
+        val config = readDiamond("blackcat^interceptMethods");
         if (StringUtils.isEmpty(config)) return false;
 
         val interceptMethods = splitLinesWoComments(config, "#");
@@ -80,8 +80,8 @@ public class BlackcatClientInterceptor extends BlackcatJavaAgentInterceptorAdapt
 
     private boolean checkInterceptMethod(MethodNode methodNode, String interceptMethod) {
         if (interceptMethod.startsWith("@")) {
-            String wildAnnClassId = interceptMethod.substring(1);
-            List visibleAnns = methodNode.visibleAnnotations;
+            val wildAnnClassId = interceptMethod.substring(1);
+            val visibleAnns = methodNode.visibleAnnotations;
             return isWildAnnPresent(wildAnnClassId, visibleAnns);
         }
 

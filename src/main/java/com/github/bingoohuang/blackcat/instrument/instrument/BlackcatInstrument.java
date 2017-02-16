@@ -61,7 +61,7 @@ public class BlackcatInstrument {
 
     private int modifyMethodCount(List<MethodNode> methods) {
         int transformedCount = 0;
-        for (MethodNode node : methods) {
+        for (val node : methods) {
             if (modifyMethod(node)) ++transformedCount;
         }
 

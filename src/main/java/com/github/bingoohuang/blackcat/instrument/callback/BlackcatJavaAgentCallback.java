@@ -28,7 +28,7 @@ public abstract class BlackcatJavaAgentCallback {
             String methodName,
             String methodDesc,
             Object[] args) {
-        String executionId = getExecutionId();
+        val executionId = getExecutionId();
         val rt = new BlackcatMethodRt(executionId,
                 className, methodName, methodDesc, args);
         try {

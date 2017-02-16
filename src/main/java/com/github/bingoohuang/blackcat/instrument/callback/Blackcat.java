@@ -2,7 +2,10 @@ package com.github.bingoohuang.blackcat.instrument.callback;
 
 import com.github.bingoohuang.blackcat.instrument.discruptor.BlackcatClient;
 import com.mashape.unirest.request.HttpRequest;
+import lombok.SneakyThrows;
+import lombok.experimental.var;
 import lombok.val;
+import org.apache.commons.httpclient.HttpMethod;
 import org.n3r.idworker.Id;
 import org.slf4j.MDC;
 import org.slf4j.helpers.MessageFormatter;
@@ -33,24 +36,29 @@ public class Blackcat {
         return blackcatContext;
     }
 
-    public static BlackcatContext reset() {
-        val context = threadLocal.get();
-        if (context != null) return context;
-
-        val traceId = String.valueOf(Id.next());
-        val linkId = "0";
-        return reset(traceId, linkId, "AUTO", "AUTO");
-    }
 
     public static BlackcatContext reset(HttpServletRequest req) {
-        String traceId = req.getHeader(BLACKCAT_TRACE_ID);
+        var traceId = req.getHeader(BLACKCAT_TRACE_ID);
         if (isEmpty(traceId)) traceId = String.valueOf(Id.next());
 
-        String linkId = req.getHeader(BLACKCAT_LINK_ID);
+        var linkId = req.getHeader(BLACKCAT_LINK_ID);
         if (isEmpty(linkId)) linkId = "0";
 
         val msg = req.getMethod() + ":" + getURL(req);
         return reset(traceId, linkId, "URL", msg);
+    }
+
+    @SneakyThrows
+    public static void prepareRPC(HttpMethod httpMethod) {
+        val context = threadLocal.get();
+        if (context == null) return;
+
+        val method = httpMethod.getName();
+        trace("RPC", method + " " + httpMethod.getURI());
+
+        httpMethod.setRequestHeader(BLACKCAT_TRACE_ID, context.getTraceId());
+        val linkId = context.getParentLinkId() + String.format(".%06d", context.getSubLinkId());
+        httpMethod.setRequestHeader(BLACKCAT_LINK_ID, linkId);
     }
 
     public static void prepareRPC(HttpRequest httpRequest) {
@@ -61,7 +69,7 @@ public class Blackcat {
         trace("RPC", httpMethod + ":" + httpRequest.getUrl());
 
         httpRequest.header(BLACKCAT_TRACE_ID, context.getTraceId());
-        val linkId = context.getParentLinkId() + "." + context.getSubLinkId();
+        val linkId = context.getParentLinkId() + String.format(".%06d", context.getSubLinkId());
         httpRequest.header(BLACKCAT_LINK_ID, linkId);
     }
 
@@ -84,18 +92,20 @@ public class Blackcat {
     }
 
     public static String trace(String msgType, String pattern, Object... args) {
-        val blackcatContext = reset();
+        val blackcatContext = threadLocal.get();
+        if (blackcatContext == null) return "none." + Id.next();
 
         val msg = MessageFormatter.arrayFormat(pattern, args).getMessage();
         return trace(blackcatContext.incrAndGetSubLinkId(), msgType, msg);
     }
 
     public static String trace(int subLinkId, String msgType, String msg) {
-        val blackcatContext = reset();
+        val blackcatContext = threadLocal.get();
+        if (blackcatContext == null) return "none." + Id.next();
 
         val parentLinkId = blackcatContext.getParentLinkId();
         val traceId = blackcatContext.getTraceId();
-        val linkId = parentLinkId + String.format(".%02d", subLinkId);
+        val linkId = parentLinkId + String.format(".%06d", subLinkId);
 
         val traceMsg = new BlackcatTraceMsg(traceId, linkId, msgType, msg);
         BlackcatClient.send(traceMsg);
