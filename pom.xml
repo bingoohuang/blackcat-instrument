@@ -3,7 +3,7 @@
 
     <groupId>com.github.bingoohuang</groupId>
     <artifactId>blackcat-instrument</artifactId>
-    <version>0.0.8-SNAPSHOT</version>
+    <version>0.0.9-SNAPSHOT </version>
     <packaging>jar</packaging>
 
     <name>blackcat-instrument</name>
@@ -43,6 +43,11 @@
             <version>1.16.10</version>
             <scope>provided</scope>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.github.bingoohuang</groupId>
+            <artifactId>westjson</artifactId>
+            <version>0.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.github.bingoohuang</groupId>
