@@ -40,25 +40,25 @@ public class BlackcatClient {
     }
 
     public static void send(BlackcatMethodRt blackcatMethodRt) {
-        if (!isBlackcatSwitchOn()) return;
+        if (isBlackcatSwitchOff()) return;
 
         blackcatMethodRtProducer.send(blackcatMethodRt);
     }
 
     public static void send(BlackcatTraceMsg traceMsg) {
-        if (!isBlackcatSwitchOn()) return;
+        if (isBlackcatSwitchOff()) return;
 
         traceMessageProducer.send(traceMsg);
     }
 
     public static void send(BlackcatMetricMsg blackcatMetricMsg) {
-        if (!isBlackcatSwitchOn()) return;
+        if (isBlackcatSwitchOff()) return;
 
         metricProducer.send(blackcatMetricMsg);
     }
 
-    public static boolean isBlackcatSwitchOn() {
-        val switchConf = new Miner().getStone("blackcatserver", "switch");
-        return "on".equals(switchConf);
+    public static boolean isBlackcatSwitchOff() {
+        val switchConf = new Miner().getMiner("blackcatserver", "config");
+        return "off".equals(switchConf.getString("switch"));
     }
 }
