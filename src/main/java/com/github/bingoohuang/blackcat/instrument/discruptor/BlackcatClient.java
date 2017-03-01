@@ -3,11 +3,11 @@ package com.github.bingoohuang.blackcat.instrument.discruptor;
 import com.github.bingoohuang.blackcat.instrument.callback.BlackcatMethodRt;
 import com.github.bingoohuang.blackcat.instrument.callback.BlackcatMetricMsg;
 import com.github.bingoohuang.blackcat.instrument.callback.BlackcatTraceMsg;
+import com.github.bingoohuang.blackcat.instrument.utils.BlackcatConfig;
 import com.github.bingoohuang.blackcat.sdk.netty.BlackcatNettyClient;
 import com.github.bingoohuang.blackcat.sdk.protobuf.BlackcatMsg.BlackcatReq;
 import com.lmax.disruptor.dsl.Disruptor;
 import lombok.val;
-import org.n3r.diamond.client.Miner;
 
 import java.util.concurrent.Executors;
 
@@ -40,25 +40,20 @@ public class BlackcatClient {
     }
 
     public static void send(BlackcatMethodRt blackcatMethodRt) {
-        if (isBlackcatSwitchOff()) return;
+        if (!BlackcatConfig.isBlackcatSwitchOn()) return;
 
         blackcatMethodRtProducer.send(blackcatMethodRt);
     }
 
     public static void send(BlackcatTraceMsg traceMsg) {
-        if (isBlackcatSwitchOff()) return;
+        if (!BlackcatConfig.isBlackcatSwitchOn()) return;
 
         traceMessageProducer.send(traceMsg);
     }
 
     public static void send(BlackcatMetricMsg blackcatMetricMsg) {
-        if (isBlackcatSwitchOff()) return;
+        if (!BlackcatConfig.isBlackcatSwitchOn()) return;
 
         metricProducer.send(blackcatMetricMsg);
-    }
-
-    public static boolean isBlackcatSwitchOff() {
-        val switchConf = new Miner().getMiner("blackcatserver", "config");
-        return "off".equals(switchConf.getString("switch"));
     }
 }

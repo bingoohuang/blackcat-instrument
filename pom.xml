@@ -3,7 +3,7 @@
 
     <groupId>com.github.bingoohuang</groupId>
     <artifactId>blackcat-instrument</artifactId>
-    <version>0.0.12-SNAPSHOT</version>
+    <version>0.0.13-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>blackcat-instrument</name>

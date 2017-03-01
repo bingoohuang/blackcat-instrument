@@ -2,6 +2,7 @@ package com.github.bingoohuang.blackcat.instrument.spring;
 
 import com.github.bingoohuang.blackcat.instrument.callback.Blackcat;
 import com.github.bingoohuang.blackcat.instrument.callback.BlackcatContext;
+import com.github.bingoohuang.blackcat.instrument.utils.BlackcatConfig;
 import lombok.val;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -18,40 +19,55 @@ public class BlackcatInterceptor extends HandlerInterceptorAdapter {
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response,
                              Object handler) throws Exception {
-        val context = Blackcat.reset(request);
-
-        prependTraceIdToCookie(request, response, context);
-        response.addHeader(Blackcat.BLACKCAT_TRACE_ID, context.getTraceId());
+        if (BlackcatConfig.isBlackcatSwitchOn()) {
+            val context = Blackcat.reset(request);
+            responseTraceIds(request, response, context);
+        }
 
         return super.preHandle(request, response, handler);
     }
 
-    private void prependTraceIdToCookie(HttpServletRequest request,
+    private void responseTraceIds(HttpServletRequest request,
+                                  HttpServletResponse response,
+                                  BlackcatContext context) {
+        responseTraceIdsCookie(request, response, context);
+
+        response.addHeader(Blackcat.BLACKCAT_TRACE_ID, context.getTraceId());
+    }
+
+    private void responseTraceIdsCookie(HttpServletRequest request,
                                         HttpServletResponse response,
                                         BlackcatContext context) {
-        val traceIdCookie = findCookie(request);
-        val traceIds = new StringBuilder(context.getTraceId());
-        if (traceIdCookie != null) {
-            traceIds.append(',').append(traceIdCookie.getValue());
-        }
+        val traceIdCookie = findCookie(request, Blackcat.BLACKCAT_TRACE_ID);
+        val traceIds = keepMaxTraceIds(context, traceIdCookie);
 
-        int cutoffPos = ordinalIndexOf(traceIds, ",", 30);
-        if (cutoffPos > 0) {
-            traceIds.delete(cutoffPos, traceIds.length());
-        }
-
-        val cookie = new Cookie(Blackcat.BLACKCAT_TRACE_ID, traceIds.toString());
+        val cookie = new Cookie(Blackcat.BLACKCAT_TRACE_ID, traceIds);
         cookie.setPath("/");
         cookie.setMaxAge(-1);
         response.addCookie(cookie);
     }
 
-    private Cookie findCookie(HttpServletRequest request) {
+    private String keepMaxTraceIds(BlackcatContext context, Cookie traceIdCookie) {
+        val traceIds = new StringBuilder(context.getTraceId());
+        String x = "X";
+        if (traceIdCookie != null) {
+            traceIds.append(x).append(traceIdCookie.getValue());
+        }
+
+        int cutoffPos = ordinalIndexOf(traceIds, x, 30);
+        if (cutoffPos > 0) {
+            traceIds.delete(cutoffPos, traceIds.length());
+        }
+
+        return traceIds.toString();
+    }
+
+    private Cookie findCookie(HttpServletRequest request, String cookieName) {
         val cookies = request.getCookies();
         if (cookies == null) return null;
 
         for (val cookie : cookies) {
-            if (cookie.getName().equals(Blackcat.BLACKCAT_TRACE_ID))
+            if (cookie.getName().equals(cookieName))
                 return cookie;
         }
         return null;
