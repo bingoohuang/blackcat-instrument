@@ -7,16 +7,27 @@ import com.github.bingoohuang.blackcat.instrument.utils.BlackcatConfig;
 import com.github.bingoohuang.blackcat.sdk.netty.BlackcatNettyClient;
 import com.github.bingoohuang.blackcat.sdk.protobuf.BlackcatMsg.BlackcatReq;
 import com.lmax.disruptor.dsl.Disruptor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.util.concurrent.Executors;
 
+@Slf4j
 public class BlackcatClient {
     static BlackcatMethodRuntimeProducer blackcatMethodRtProducer;
     static BlackcatTraceMessageProducer traceMessageProducer;
     static BlackcatMetricProducer metricProducer;
 
     static {
+        try {
+            init();
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("init BlackcatClient failed", e);
+        }
+    }
+
+    private static void init() {
         // The factory for the event
         val factory = new BlackcatReqFactory();
         // Specify the size of the ring buffer, must be power of 2.

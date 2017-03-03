@@ -15,8 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class Blackcat {
-    public static final String BLACKCAT_TRACE_ID = "blackcat_trace_id";
-    public static final String BLACKCAT_LINK_ID = "blackcat_link_id";
+    public static final String BLACKCAT_TRACEID = "blackcat-traceid";
+    public static final String BLACKCAT_LINKID = "blackcat-linkid";
 
     static ThreadLocal<BlackcatContext> threadLocal = new InheritableThreadLocal<BlackcatContext>();
 
@@ -29,19 +29,18 @@ public class Blackcat {
         blackcatContext.setTraceId(blackcatTraceId);
         blackcatContext.setParentLinkId(parentLinkId);
 
-        MDC.put(BLACKCAT_TRACE_ID, blackcatTraceId);
+        MDC.put(BLACKCAT_TRACEID, blackcatTraceId);
         threadLocal.set(blackcatContext);
 
         trace(blackcatContext.getSubLinkId(), msgType, msg);
         return blackcatContext;
     }
 
-
     public static BlackcatContext reset(HttpServletRequest req) {
-        var traceId = req.getHeader(BLACKCAT_TRACE_ID);
+        var traceId = req.getHeader(BLACKCAT_TRACEID);
         if (isEmpty(traceId)) traceId = String.valueOf(Id.next());
 
-        var linkId = req.getHeader(BLACKCAT_LINK_ID);
+        var linkId = req.getHeader(BLACKCAT_LINKID);
         if (isEmpty(linkId)) linkId = "0";
 
         val msg = req.getMethod() + ":" + getURL(req);
@@ -56,9 +55,9 @@ public class Blackcat {
         val method = httpMethod.getName();
         trace("RPC", method + " " + httpMethod.getURI());
 
-        httpMethod.setRequestHeader(BLACKCAT_TRACE_ID, context.getTraceId());
+        httpMethod.setRequestHeader(BLACKCAT_TRACEID, context.getTraceId());
         val linkId = context.getParentLinkId() + String.format(".%06d", context.getSubLinkId());
-        httpMethod.setRequestHeader(BLACKCAT_LINK_ID, linkId);
+        httpMethod.setRequestHeader(BLACKCAT_LINKID, linkId);
     }
 
     public static void prepareRPC(HttpRequest httpRequest) {
@@ -68,9 +67,9 @@ public class Blackcat {
         val httpMethod = httpRequest.getHttpMethod().name();
         trace("RPC", httpMethod + ":" + httpRequest.getUrl());
 
-        httpRequest.header(BLACKCAT_TRACE_ID, context.getTraceId());
+        httpRequest.header(BLACKCAT_TRACEID, context.getTraceId());
         val linkId = context.getParentLinkId() + String.format(".%06d", context.getSubLinkId());
-        httpRequest.header(BLACKCAT_LINK_ID, linkId);
+        httpRequest.header(BLACKCAT_LINKID, linkId);
     }
 
     public static void count(String metricName) {

@@ -32,16 +32,16 @@ public class BlackcatInterceptor extends HandlerInterceptorAdapter {
                                   BlackcatContext context) {
         responseTraceIdsCookie(request, response, context);
 
-        response.addHeader(Blackcat.BLACKCAT_TRACE_ID, context.getTraceId());
+        response.addHeader(Blackcat.BLACKCAT_TRACEID, context.getTraceId());
     }
 
     private void responseTraceIdsCookie(HttpServletRequest request,
                                         HttpServletResponse response,
                                         BlackcatContext context) {
-        val traceIdCookie = findCookie(request, Blackcat.BLACKCAT_TRACE_ID);
+        val traceIdCookie = findCookie(request, Blackcat.BLACKCAT_TRACEID);
         val traceIds = keepMaxTraceIds(context, traceIdCookie);
 
-        val cookie = new Cookie(Blackcat.BLACKCAT_TRACE_ID, traceIds);
+        val cookie = new Cookie(Blackcat.BLACKCAT_TRACEID, traceIds);
         cookie.setPath("/");
         cookie.setMaxAge(-1);
         response.addCookie(cookie);
