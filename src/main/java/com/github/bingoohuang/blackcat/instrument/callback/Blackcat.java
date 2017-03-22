@@ -4,6 +4,7 @@ import com.github.bingoohuang.blackcat.instrument.discruptor.BlackcatClient;
 import com.mashape.unirest.request.HttpRequest;
 import lombok.SneakyThrows;
 import lombok.experimental.var;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.httpclient.HttpMethod;
 import org.n3r.idworker.Id;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+@Slf4j
 public class Blackcat {
     public static final String BLACKCAT_TRACEID = "blackcat-traceid";
     public static final String BLACKCAT_LINKID = "blackcat-linkid";
@@ -107,6 +109,7 @@ public class Blackcat {
         val linkId = parentLinkId + String.format(".%06d", subLinkId);
 
         val traceMsg = new BlackcatTraceMsg(traceId, linkId, msgType, msg);
+        log.debug("Blackcat trace {}", traceMsg);
         BlackcatClient.send(traceMsg);
         return linkId;
     }

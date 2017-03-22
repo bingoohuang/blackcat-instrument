@@ -1,7 +1,6 @@
 package com.github.bingoohuang.blackcat.instrument.spring;
 
 import com.github.bingoohuang.blackcat.instrument.callback.Blackcat;
-import com.github.bingoohuang.blackcat.instrument.callback.BlackcatContext;
 import com.github.bingoohuang.blackcat.instrument.utils.BlackcatConfig;
 import lombok.val;
 import org.springframework.web.servlet.ModelAndView;
@@ -19,27 +18,26 @@ public class BlackcatInterceptor extends HandlerInterceptorAdapter {
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response,
                              Object handler) throws Exception {
-        if (BlackcatConfig.isBlackcatSwitchOn()) {
-            val context = Blackcat.reset(request);
-            responseTraceIds(request, response, context);
+        if (BlackcatConfig.isBlackcatSwitchOn()
+                && Blackcat.currentTraceId() == null) {
+            Blackcat.reset(request);
+            responseTraceIds(request, response);
         }
 
         return super.preHandle(request, response, handler);
     }
 
-    private void responseTraceIds(HttpServletRequest request,
-                                  HttpServletResponse response,
-                                  BlackcatContext context) {
-        responseTraceIdsCookie(request, response, context);
+    public static void responseTraceIds(HttpServletRequest request,
+                                        HttpServletResponse response) {
+        responseTraceIdsCookie(request, response);
 
-        response.addHeader(Blackcat.BLACKCAT_TRACEID, context.getTraceId());
+        response.addHeader(Blackcat.BLACKCAT_TRACEID, Blackcat.currentTraceId());
     }
 
-    private void responseTraceIdsCookie(HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        BlackcatContext context) {
+    private static void responseTraceIdsCookie(HttpServletRequest request,
+                                               HttpServletResponse response) {
         val traceIdCookie = findCookie(request, Blackcat.BLACKCAT_TRACEID);
-        val traceIds = keepMaxTraceIds(context, traceIdCookie);
+        val traceIds = keepMaxTraceIds(traceIdCookie);
 
         val cookie = new Cookie(Blackcat.BLACKCAT_TRACEID, traceIds);
         cookie.setPath("/");
@@ -47,8 +45,8 @@ public class BlackcatInterceptor extends HandlerInterceptorAdapter {
         response.addCookie(cookie);
     }
 
-    private String keepMaxTraceIds(BlackcatContext context, Cookie traceIdCookie) {
-        val traceIds = new StringBuilder(context.getTraceId());
+    private static String keepMaxTraceIds(Cookie traceIdCookie) {
+        val traceIds = new StringBuilder(Blackcat.currentTraceId());
         String x = "X";
         if (traceIdCookie != null) {
             traceIds.append(x).append(traceIdCookie.getValue());
@@ -62,7 +60,7 @@ public class BlackcatInterceptor extends HandlerInterceptorAdapter {
         return traceIds.toString();
     }
 
-    private Cookie findCookie(HttpServletRequest request, String cookieName) {
+    private static Cookie findCookie(HttpServletRequest request, String cookieName) {
         val cookies = request.getCookies();
         if (cookies == null) return null;
 
@@ -78,7 +76,6 @@ public class BlackcatInterceptor extends HandlerInterceptorAdapter {
                            HttpServletResponse response,
                            Object handler,
                            ModelAndView modelAndView) throws Exception {
-        Blackcat.trace("PostHandle", "post handle");
         super.postHandle(request, response, handler, modelAndView);
     }
 
@@ -91,4 +88,6 @@ public class BlackcatInterceptor extends HandlerInterceptorAdapter {
 
         super.afterCompletion(request, response, handler, ex);
     }
+
+
 }

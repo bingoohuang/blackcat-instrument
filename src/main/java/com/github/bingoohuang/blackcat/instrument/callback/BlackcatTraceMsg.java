@@ -1,9 +1,9 @@
 package com.github.bingoohuang.blackcat.instrument.callback;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Value;
 
-@Getter @AllArgsConstructor
+@Value @AllArgsConstructor
 public class BlackcatTraceMsg {
     private final String traceId;
     private final String linkId;

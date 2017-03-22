@@ -1,5 +1,9 @@
 package com.github.bingoohuang.blackcat.instrument.utils;
 
+import lombok.val;
+
+import java.io.UnsupportedEncodingException;
+
 /**
  * @author bingoohuang [bingoohuang@gmail.com] Created on 2017/2/16.
  */
@@ -22,4 +26,37 @@ public class MoreStr {
 
         return -1;
     }
+
+    public static boolean anyOf(String str, String... anys) {
+        if (str == null) return false;
+        for (String any : anys) {
+            if (any.equals(str)) return true;
+        }
+        return false;
+    }
+
+
+    public static final int MAX_PAYLOAD_LENGTH = 1000;
+
+    public static String getContent(byte[] buf, String charsetName) {
+        if (buf == null || buf.length == 0) return "";
+        int length = Math.min(buf.length, MAX_PAYLOAD_LENGTH);
+        try {
+            val characterEncoding = charsetName != null ? charsetName : "ISO-8859-1";
+            return new String(buf, 0, length, characterEncoding);
+        } catch (UnsupportedEncodingException ex) {
+            return "Unsupported Encoding";
+        }
+    }
+
+    public static boolean startsWithAny(String str, String... anys) {
+        if (str == null) return false;
+
+        for (val any : anys) {
+            if (str.startsWith(any)) return true;
+        }
+
+        return false;
+    }
+
 }
