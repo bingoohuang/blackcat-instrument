@@ -1,14 +1,15 @@
 package com.github.bingoohuang.blackcat.instrument.callback;
 
+import com.github.bingoohuang.westid.WestId;
 import lombok.Setter;
 import lombok.ToString;
-import org.n3r.idworker.Id;
+import lombok.val;
 
 import java.lang.management.ManagementFactory;
 
 @ToString
 public class BlackcatMethodRt {
-    public final String invokeId = "" + Id.next();
+    public final String invokeId = String.valueOf(WestId.next());
     public final String executionId;
     public final String pid = getPid();
     public final long startMillis = System.currentTimeMillis();
@@ -29,16 +30,15 @@ public class BlackcatMethodRt {
     @Setter public String throwableMessage;
 
     public static String getPid() {
-        String name = ManagementFactory.getRuntimeMXBean().getName();
+        val name = ManagementFactory.getRuntimeMXBean().getName();
         return name.split("@")[0]; // --> 742912@localhost
     }
 
-    public BlackcatMethodRt(
-            String executionId,
-            String className,
-            String methodName,
-            String methodDesc,
-            Object[] args) {
+    public BlackcatMethodRt(String executionId,
+                            String className,
+                            String methodName,
+                            String methodDesc,
+                            Object[] args) {
         this.executionId = executionId;
         this.className = className;
         this.methodName = methodName;

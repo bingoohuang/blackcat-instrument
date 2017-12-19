@@ -24,17 +24,17 @@ public class BlackcatLoggingFilter extends OncePerRequestFilter {
             return;
         }
 
-        long requestId = id.incrementAndGet();
+        val requestId = id.incrementAndGet();
         val requestWrapper = new BlackcatRequestWrapper(requestId, request);
         val responseWrapper = new BlackcatResponseWrapper(requestId, response);
 
-        long startMillis = System.currentTimeMillis();
+        val startMillis = System.currentTimeMillis();
         try {
             filterChain.doFilter(requestWrapper, responseWrapper);
         } finally {
             if (Blackcat.currentTraceId() == null) return;
 
-            long endMillis = System.currentTimeMillis();
+            val endMillis = System.currentTimeMillis();
             requestWrapper.logRequest(startMillis);
             responseWrapper.logResponse(endMillis, endMillis - startMillis);
         }

@@ -16,7 +16,7 @@ import static org.objectweb.asm.Type.getObjectType;
 
 public class Asms {
     public static String describeMethod(MethodNode mn, boolean withThrows) {
-        StrBuilder desc = new StrBuilder();
+        val desc = new StrBuilder();
 
         appendAccessWords(mn, desc);
         appendReturnType(mn, desc);
@@ -28,7 +28,7 @@ public class Asms {
     }
 
     private static void appendReturnType(MethodNode mn, StrBuilder desc) {
-        Type returnType = Type.getReturnType(mn.desc);
+        val returnType = Type.getReturnType(mn.desc);
         desc.p(simpleClassName(returnType.getClassName())).p(' ');
     }
 
@@ -37,7 +37,7 @@ public class Asms {
 
         List<String> thrownInternalClassNames = mn.exceptions;
         desc.p(" throws ");
-        for (String internalClassName : thrownInternalClassNames) {
+        for (val internalClassName : thrownInternalClassNames) {
             desc.p(getObjectType(internalClassName).getClassName());
             desc.p(", ");
         }
@@ -45,13 +45,13 @@ public class Asms {
     }
 
     private static void appendArguments(MethodNode mn, StrBuilder description) {
-        Type[] argumentTypes = Type.getArgumentTypes(mn.desc);
+        val argumentTypes = Type.getArgumentTypes(mn.desc);
         description.p('(');
         for (int i = 0; i < argumentTypes.length; i++) {
-            Type argumentType = argumentTypes[i];
+            val argumentType = argumentTypes[i];
             if (i > 0) description.p(", ");
-            String className = argumentType.getClassName();
-            String simpleClassName = simpleClassName(className);
+            val className = argumentType.getClassName();
+            val simpleClassName = simpleClassName(className);
             description.p(simpleClassName);
         }
         description.p(')');
@@ -68,7 +68,7 @@ public class Asms {
 
     private static String simpleClassName(String className) {
         int pos = -1;
-        char[] chars = className.toCharArray();
+        val chars = className.toCharArray();
         for (int i = 0; i < chars.length; ++i) {
             char c = chars[i];
             if (c == '.' || c == '/') pos = i;
@@ -77,61 +77,53 @@ public class Asms {
     }
 
 
-    public static boolean isAnyMethodAnnPresent(
-            List<MethodNode> methods,
-            Class<? extends Annotation> annotationClass) {
-        for (MethodNode mn : methods) {
+    public static boolean isAnyMethodAnnPresent(List<MethodNode> methods,
+                                                Class<? extends Annotation> annotationClass) {
+        for (val mn : methods) {
             if (isAnnPresent(mn, annotationClass)) return true;
         }
 
         return false;
     }
 
-    public static boolean isAnnPresent(
-            ClassNode cn, Class<? extends Annotation> annotationClass) {
+    public static boolean isAnnPresent(ClassNode cn, Class<? extends Annotation> annotationClass) {
         return isAnnPresent(annotationClass, cn.visibleAnnotations);
     }
 
-    public static AnnotationNode getAnn(
-            ClassNode cn, Class<? extends Annotation> annotationClass) {
+    public static AnnotationNode getAnn(ClassNode cn, Class<? extends Annotation> annotationClass) {
         return getAnn(annotationClass, cn.visibleAnnotations);
     }
 
-    public static AnnotationNode getAnn(
-            Class<? extends Annotation> annotationClass,
-            List<AnnotationNode> visibleAnnotations) {
-        String expectedDesc = ci(annotationClass);
+    public static AnnotationNode getAnn(Class<? extends Annotation> annotationClass,
+                                        List<AnnotationNode> visibleAnnotations) {
+        val expectedDesc = ci(annotationClass);
         return getAnn(expectedDesc, visibleAnnotations);
     }
 
-    public static AnnotationNode getAnn(
-            String annClassId, List<AnnotationNode> visibleAnnotations) {
+    public static AnnotationNode getAnn(String annClassId, List<AnnotationNode> visibleAnnotations) {
         if (visibleAnnotations == null) return null;
 
-        for (AnnotationNode visibleAnn : visibleAnnotations) {
+        for (val visibleAnn : visibleAnnotations) {
             if (annClassId.equals(visibleAnn.desc)) return visibleAnn;
         }
 
         return null;
     }
 
-    public static boolean isAnnPresent(
-            MethodNode mn, Class<? extends Annotation> annotationClass) {
+    public static boolean isAnnPresent(MethodNode mn, Class<? extends Annotation> annotationClass) {
         return isAnnPresent(annotationClass, mn.visibleAnnotations);
     }
 
-    public static boolean isAnnPresent(
-            Class<? extends Annotation> annotationClass,
-            List<AnnotationNode> visibleAnnotations) {
-        String expectedDesc = ci(annotationClass);
+    public static boolean isAnnPresent(Class<? extends Annotation> annotationClass,
+                                       List<AnnotationNode> visibleAnnotations) {
+        val expectedDesc = ci(annotationClass);
         return isAnnPresent(expectedDesc, visibleAnnotations);
     }
 
-    public static boolean isAnnPresent(
-            String annClassId, List<AnnotationNode> visibleAnnotations) {
+    public static boolean isAnnPresent(String annClassId, List<AnnotationNode> visibleAnnotations) {
         if (visibleAnnotations == null) return false;
 
-        for (AnnotationNode visibleAnn : visibleAnnotations) {
+        for (val visibleAnn : visibleAnnotations) {
             if (annClassId.equals(visibleAnn.desc)) return true;
         }
 
@@ -139,13 +131,12 @@ public class Asms {
     }
 
 
-    public static boolean isWildAnnPresent(
-            String wildAnnClassId, List<AnnotationNode> visibleAnns) {
+    public static boolean isWildAnnPresent(String wildAnnClassId, List<AnnotationNode> visibleAnns) {
         if (visibleAnns == null) return false;
 
         for (val visibleAnn : visibleAnns) {
-            Type annType = Type.getType(visibleAnn.desc);
-            String annClassName = annType.getClassName();
+            val annType = Type.getType(visibleAnn.desc);
+            val annClassName = annType.getClassName();
             if (wildcardMatch(annClassName, wildAnnClassId)) return true;
         }
 
@@ -196,7 +187,7 @@ public class Asms {
     }
 
     public static String sig(Class[] retvalParams) {
-        Class[] justParams = new Class[retvalParams.length - 1];
+        val justParams = new Class[retvalParams.length - 1];
         System.arraycopy(retvalParams, 1, justParams, 0, justParams.length);
         return sigParams(justParams) + ci(retvalParams[0]);
     }
@@ -206,7 +197,7 @@ public class Asms {
     }
 
     public static String sigParams(Class... params) {
-        StringBuilder signature = new StringBuilder("(");
+        val signature = new StringBuilder("(");
 
         for (int i = 0; i < params.length; i++) {
             signature.append(ci(params[i]));
@@ -218,7 +209,7 @@ public class Asms {
     }
 
     public static String sigParams(String descriptor, Class... params) {
-        StringBuilder signature = new StringBuilder("(");
+        val signature = new StringBuilder("(");
 
         signature.append(descriptor);
 

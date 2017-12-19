@@ -23,11 +23,10 @@ public abstract class BlackcatJavaAgentCallback {
         return INSTANCE;
     }
 
-    public final BlackcatMethodRt doStart(
-            String className,
-            String methodName,
-            String methodDesc,
-            Object[] args) {
+    public final BlackcatMethodRt doStart(String className,
+                                          String methodName,
+                                          String methodDesc,
+                                          Object[] args) {
         val executionId = getExecutionId();
         val rt = new BlackcatMethodRt(executionId,
                 className, methodName, methodDesc, args);

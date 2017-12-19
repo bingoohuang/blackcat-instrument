@@ -20,7 +20,7 @@ public class BlackcatMethodRuntimeProducer {
     public void send(BlackcatMethodRt rt) {
         if (StringUtils.isBlank(rt.traceId)) return;
 
-        long sequence = ringBuffer.next();  // Grab the next sequence
+        val sequence = ringBuffer.next();  // Grab the next sequence
         try {
             val builder = ringBuffer.get(sequence); // Get the entry in the Disruptor
             // for the sequence Fill with data

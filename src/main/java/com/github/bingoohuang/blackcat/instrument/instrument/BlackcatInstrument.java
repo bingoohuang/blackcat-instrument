@@ -100,7 +100,7 @@ public class BlackcatInstrument {
             insnList.add(new InsnNode(DUP));
             insnList.add(getPushInst(i));
             insnList.add(getLoadInst(methodArgs[i], getArgumentPosition(i)));
-            MethodInsnNode mNode = getWrapperCtorInst(methodArgs[i]);
+            val mNode = getWrapperCtorInst(methodArgs[i]);
             if (mNode != null) insnList.add(mNode);
             insnList.add(new InsnNode(AASTORE));
         }
@@ -162,7 +162,7 @@ public class BlackcatInstrument {
     private void addTraceThrowableUncaught() {
         val insnList = methodNode.instructions;
 
-        LabelNode endNode = new LabelNode();
+        val endNode = new LabelNode();
         insnList.add(endNode);
 
         addCatchBlock(startNode, endNode);
@@ -175,7 +175,7 @@ public class BlackcatInstrument {
         val handlerNode = new LabelNode();
         insnList.add(handlerNode);
 
-        int exceptionVariablePosition = getFistAvailablePosition();
+        val exceptionVariablePosition = getFistAvailablePosition();
         insnList.add(new VarInsnNode(ASTORE, exceptionVariablePosition));
         methodOffset++;
 
@@ -206,7 +206,7 @@ public class BlackcatInstrument {
     private InsnList getThrowTraceInsts() {
         val insnList = new InsnList();
 
-        int exceptionVariablePosition = getFistAvailablePosition();
+        val exceptionVariablePosition = getFistAvailablePosition();
         insnList.add(new VarInsnNode(ASTORE, exceptionVariablePosition));
 
         methodOffset++;
@@ -225,13 +225,13 @@ public class BlackcatInstrument {
     private InsnList getReturnTraceInsts() {
         val insnList = new InsnList();
 
-        int returnedVariablePosition = getFistAvailablePosition();
+        val returnedVariablePosition = getFistAvailablePosition();
         insnList.add(getStoreInst(methodReturnType, returnedVariablePosition));
 
         updateMethodOffset(methodReturnType);
         insnList.add(new VarInsnNode(ALOAD, catVarIndex));
         insnList.add(getLoadInst(methodReturnType, returnedVariablePosition));
-        MethodInsnNode mNode = getWrapperCtorInst(methodReturnType);
+        val mNode = getWrapperCtorInst(methodReturnType);
         if (mNode != null) insnList.add(mNode);
         insnList.add(new MethodInsnNode(INVOKEVIRTUAL,
                 p(Blackcat.class), "finish",

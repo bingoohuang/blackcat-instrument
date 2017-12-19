@@ -1,13 +1,13 @@
 package com.github.bingoohuang.blackcat.instrument.callback;
 
 import com.github.bingoohuang.blackcat.instrument.discruptor.BlackcatClient;
+import com.github.bingoohuang.westid.WestId;
 import com.mashape.unirest.request.HttpRequest;
 import lombok.SneakyThrows;
 import lombok.experimental.var;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.httpclient.HttpMethod;
-import org.n3r.idworker.Id;
 import org.slf4j.MDC;
 import org.slf4j.helpers.MessageFormatter;
 
@@ -40,7 +40,7 @@ public class Blackcat {
 
     public static BlackcatContext reset(HttpServletRequest req) {
         var traceId = req.getHeader(BLACKCAT_TRACEID);
-        if (isEmpty(traceId)) traceId = String.valueOf(Id.next());
+        if (isEmpty(traceId)) traceId = String.valueOf(WestId.next());
 
         var linkId = req.getHeader(BLACKCAT_LINKID);
         if (isEmpty(linkId)) linkId = "0";
@@ -94,7 +94,7 @@ public class Blackcat {
 
     public static String trace(String msgType, String pattern, Object... args) {
         val blackcatContext = threadLocal.get();
-        if (blackcatContext == null) return "none." + Id.next();
+        if (blackcatContext == null) return "none." + WestId.next();
 
         val msg = MessageFormatter.arrayFormat(pattern, args).getMessage();
         return trace(blackcatContext.incrAndGetSubLinkId(), msgType, msg);
@@ -102,7 +102,7 @@ public class Blackcat {
 
     public static String trace(int subLinkId, String msgType, String msg) {
         val blackcatContext = threadLocal.get();
-        if (blackcatContext == null) return "none." + Id.next();
+        if (blackcatContext == null) return "none." + WestId.next();
 
         val parentLinkId = blackcatContext.getParentLinkId();
         val traceId = blackcatContext.getTraceId();

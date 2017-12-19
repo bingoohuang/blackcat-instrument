@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.github.bingoohuang.blackcat.instrument.callback.BlackcatJavaAgentInterceptor;
 import com.github.bingoohuang.blackcat.instrument.callback.BlackcatMethodRt;
 import com.google.common.io.Files;
+import lombok.val;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FileUtils;
 import org.objectweb.asm.tree.ClassNode;
@@ -46,7 +47,7 @@ public class LoggingInterceptor extends BlackcatJavaAgentInterceptor {
 
     @Override
     protected void onStart(BlackcatMethodRt rt) {
-        File file = getFile(rt);
+        val file = getFile(rt);
         trace(file, "#onStart:" + rt.executionId);
         trace(file, "#ClassName: " + rt.className);
         trace(file, "#MethodDesc: " + rt.methodDesc);
@@ -57,7 +58,7 @@ public class LoggingInterceptor extends BlackcatJavaAgentInterceptor {
 
     @Override
     protected void onThrowableCaught(BlackcatMethodRt rt) {
-        File file = getFile(rt);
+        val file = getFile(rt);
         trace(file, "#onThrowableCaught:" + rt.executionId);
         trace(file, "#Elapsed: " + rt.costNano + " ns");
         trace(file, "#SAME:" + (rt.throwableUncaught == rt.throwableCaught));
@@ -67,7 +68,7 @@ public class LoggingInterceptor extends BlackcatJavaAgentInterceptor {
 
     @Override
     protected void onThrowableUncaught(BlackcatMethodRt rt) {
-        File file = getFile(rt);
+        val file = getFile(rt);
         trace(file, "#onThrowableUncaught:" + rt.executionId);
         trace(file, "#Elapsed: " + rt.costNano + " ns");
         trace(file, "#SAME:" + (rt.throwableUncaught == rt.throwableCaught));
@@ -78,7 +79,7 @@ public class LoggingInterceptor extends BlackcatJavaAgentInterceptor {
 
     @Override
     protected void onFinish(BlackcatMethodRt rt) {
-        File file = getFile(rt);
+        val file = getFile(rt);
         trace(file, "#onFinish:" + rt.executionId);
         trace(file, "#Elapsed: " + rt.costNano + " ns");
         trace(file, "#Returned:" + toJSON(rt.result));

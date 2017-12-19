@@ -57,7 +57,7 @@ public class BlackcatClientInterceptor extends BlackcatJavaAgentInterceptorAdapt
 
         val dottedClassName = className.replace('/', '.');
         val interceptClasses = splitLinesWoComments(config, "#");
-        for (String interceptClass : interceptClasses) {
+        for (val interceptClass : interceptClasses) {
             if (wildcardMatch(dottedClassName, interceptClass)) return true;
         }
 
@@ -71,7 +71,7 @@ public class BlackcatClientInterceptor extends BlackcatJavaAgentInterceptorAdapt
         if (StringUtils.isEmpty(config)) return false;
 
         val interceptMethods = splitLinesWoComments(config, "#");
-        for (String interceptMethod : interceptMethods) {
+        for (val interceptMethod : interceptMethods) {
             if (checkInterceptMethod(methodNode, interceptMethod)) return true;
         }
 

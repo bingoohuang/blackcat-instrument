@@ -25,12 +25,12 @@ public class TreeAsms {
     }
 
     private static int getStoreOpCode(Type type) {
-        char ch = type.getDescriptor().charAt(0);
-        if ("BCIZS".indexOf(ch) >= 0) return ISTORE;
-        if ('D' == ch) return DSTORE;
-        if ('F' == ch) return FSTORE;
-        if ('J' == ch) return LSTORE;
-        if ("L[".indexOf(ch) >= 0) return ASTORE;
+        char c = type.getDescriptor().charAt(0);
+        if ("BCIZS".indexOf(c) >= 0) return ISTORE;
+        if ('D' == c) return DSTORE;
+        if ('F' == c) return FSTORE;
+        if ('J' == c) return LSTORE;
+        if ("L[".indexOf(c) >= 0) return ASTORE;
 
         throw new ClassFormatError("Invalid method signature: " + type.getDescriptor());
     }

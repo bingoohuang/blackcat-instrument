@@ -42,8 +42,8 @@ public class MoreStr {
         if (buf == null || buf.length == 0) return "";
         int length = Math.min(buf.length, MAX_PAYLOAD_LENGTH);
         try {
-            val characterEncoding = charsetName != null ? charsetName : "ISO-8859-1";
-            return new String(buf, 0, length, characterEncoding);
+            val encoding = charsetName != null ? charsetName : "ISO-8859-1";
+            return new String(buf, 0, length, encoding);
         } catch (UnsupportedEncodingException ex) {
             return "Unsupported Encoding";
         }

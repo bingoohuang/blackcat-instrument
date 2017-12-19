@@ -23,8 +23,8 @@ public class Debugs {
         if (annNode.values == null) return false;
 
         for (int i = 0, ii = annNode.values.size(); i < ii; i += 2) {
-            String name = (String) annNode.values.get(i);
-            Object value = annNode.values.get(i + 1);
+            val name = (String) annNode.values.get(i);
+            val value = annNode.values.get(i + 1);
             if ("debug".equals(name) && value.equals(true)) return true;
         }
         return false;
@@ -32,7 +32,7 @@ public class Debugs {
 
     private static void writeClassFile(String className, byte[] bytes) {
         try {
-            String classFilename = Asms.c(className) + ".class";
+            val classFilename = Asms.c(className) + ".class";
             Files.write(bytes, new File(classFilename));
         } catch (IOException ex) {
             throw new RuntimeException(ex);

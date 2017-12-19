@@ -82,7 +82,7 @@ public class BlackcatResponseWrapper extends HttpServletResponseWrapper {
     private String createResponseHeads() {
         val headerNames = getHeaderNames();
         val headerMap = new HashMap<String, String>();
-        for (String headerName : headerNames) {
+        for (val headerName : headerNames) {
             if (MoreStr.anyOf(headerName, "Connection", "Date")) continue;
 
             val headers = getHeaders(headerName);
